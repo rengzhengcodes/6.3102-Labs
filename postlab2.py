@@ -22,7 +22,8 @@ def w(start: float, iterations: int):
     for _ in range(iterations):
         # Calculates the current value of w_n
         w_next = w_n + delta_T * (beta * w_n + gamma * c(w_n, w_n_prev))
-        yield w_n
+        for i in range(3):
+            yield w_n
         # Sets the previous value of w to the current value.
         w_n_prev = w_n
         # Sets the current value of w to the next value.
@@ -31,16 +32,16 @@ def w(start: float, iterations: int):
 # Draws a graph of the values of w for the first 2 seconds.
 def draw_graph():
     # The number of values to draw.
-    num_points = int(2 / delta_T)
+    num_points = int(3 / delta_T)
     # The values of w to draw.
-    w_values = [w_n for w_n in w(0, num_points)]
+    w_values = [w_n - w_d for w_n in w(0, num_points)]
     # The time values to draw.
-    time_values = [delta_T * n for n in range(num_points)]
+    time_values = [delta_T/3 * n for n in range(num_points * 3)]
     # Draws the graph.
-    plt.plot(time_values, w_values[:num_points])
+    plt.plot(time_values, w_values)
     plt.xlabel("Time (s)")
-    plt.ylabel("Angular Velocity (rad/s)")
-    plt.title("Angular Velocity of the Motor Over Time")
+    plt.ylabel("Amplitude (rad/s)")
+    plt.title("Angular Velocity Deviation of the Motor Over Time")
     plt.show()
 
 draw_graph()
