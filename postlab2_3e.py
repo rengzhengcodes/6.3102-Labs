@@ -49,15 +49,14 @@ def plot_zoomed_lams_for_ab_pairs(lams_lists, ab_list, tol=1e-12):
 
   plt.tight_layout()
 
-# Calculate natural freqs for given set of parameters
-def calc_lams_ab(a, b):
-  lam_base = (1 + dT * beta - dT * gamma * Kp * a)/2
-  lam_pm = cmath.sqrt((1 + dT * beta  - dT * gamma * Kp * a) ** 2 - 4 * dT * gamma * Kp * b)/2
-  return (lam_base + lam_pm, lam_base - lam_pm)
-
+# Global a,b lam correlation
+global_ab_lam = None
 # Compute natural freqs for a list of ab values (for fixed Ktheta)
 def calc_lams_ab_for_abs(ab_list):
-  lams = [calc_lams_ab(a, b) for a, b in ab_list];
+  global global_ab_lam 
+  global_ab_lam = [(np.linalg.eig(np.array([[1+ dT*beta - dT*gamma*Kp*a, -dT*gamma*Kp*b],
+                                  [1, 0]]))[0], (a, b)) for a, b in ab_list];
+  lams = [lam for lam, ab in global_ab_lam]
   lams1, lams2 = list(zip(*lams));
   return np.array(lams1), np.array(lams2)
 
@@ -70,15 +69,15 @@ ab_list = tuple(ab_list)
 lams = calc_lams_ab_for_abs(ab_list)
 plot_lams_evolution(lams)
 
-# Finds and prints the values of a and b that give the smallest natural frequency.
-# As second orders are conjugate pairs, we only need to check one of them.
-min_index = 0
-min_mag = 1
-for i, lam in enumerate(lams[0]):
-    if (mag := abs(lam)) < min_mag:
-        min_index = i
-        min_mag = mag
+# Finds and prints the values of a and b that give the smallest natural frequency pairs.
+min_ab = None
+min_mag_tot = 2
+for i, lam_ab in enumerate(global_ab_lam):
+    lam, ab = lam_ab
+    if (mag_tot := abs(lam[0]) + abs(lam[1])) < min_mag_tot:
+        min_ab = ab
+        min_mag_tot = mag_tot
 
-print(f"Freq Mag: {min_mag}, (a, b): {ab_list[min_index]}")
+print(f"Freq Mag: {min_mag_tot}, (a, b): {min_ab}")
 
 plt.show()
