@@ -7,13 +7,16 @@ gamma: float = 16.93
 RPS: float = 15
 delta_T: float = 1/RPS
 
+a=15/16
+b=1/16
+
 w_d = 1
 
 # iterator returning the next value of w given a starting value.
 def w(start: float, iterations: int):
     # calculates the c[n] of this step.
     def c(w_n: float, w_n_prev: float):
-        return Kp * (w_d - (w_n + w_n_prev) / 2)
+        return Kp * (w_d - (a*w_n + b*w_n_prev))
 
     # The current value of w.
     w_n: float = start
